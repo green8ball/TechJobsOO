@@ -2,6 +2,7 @@
 using TechJobs.Data;
 using TechJobs.ViewModels;
 using TechJobs.Models;
+using System.Linq;
 
 
 namespace TechJobs.Controllers
@@ -47,7 +48,27 @@ namespace TechJobs.Controllers
             // new Job and add it to the JobData data store. Then
             // redirect to the Job detail (Index) action/view for the new Job.
 
-            return View(newJobViewModel);
+            if (newJobViewModel.Name != "")
+            {
+                Job newJob = new Job()
+                {
+                    Name = newJobViewModel.Name,
+                    Employer = jobData.Employers.Find(newJobViewModel.EmployerID),
+                    Location = jobData.Locations.Find(newJobViewModel.LocationID),
+                    CoreCompetency = jobData.CoreCompetencies.Find(newJobViewModel.CoreCompetencyID),
+                    PositionType = jobData.PositionTypes.Find(newJobViewModel.PositionTypeID)
+                };
+
+                jobData.Jobs.Add(newJob);
+
+                string url = string.Format("/Job?={0}", newJob.ID);
+                return Redirect(url);
+            }
+            else
+            {
+                return View();
+            }
+
         }
     }
 }
